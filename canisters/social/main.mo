@@ -8,11 +8,10 @@ import Debug "mo:base/Debug";
 
 actor PostCrud {
 	public type ImageObject = [Nat8];
-	public type User = Principal;
 
 	type PostId = Nat32;
 	type Post = {
-		creator: Principal;
+		creator: Text;
 		message: Text;
 	};
 
@@ -29,7 +28,7 @@ actor PostCrud {
 	};
 
 	public shared (msg) func createPost(message: Text) : async () {
-		let user: Principal = msg.caller;
+		let user: Text = Principal.toText(msg.caller);
 		let post = {creator=user; message=message};
 
 		postList.put(Nat32.toText(generateTaskId()), post);
@@ -50,7 +49,7 @@ actor PostCrud {
 	};
 
 	public shared (msg) func updatePost (id: Text, message: Text) : async Bool {
-		let user: Principal = msg.caller;
+		let user: Text = Principal.toText(msg.caller);
 		let post: ?Post = postList.get(id);
 
 		switch (post) {

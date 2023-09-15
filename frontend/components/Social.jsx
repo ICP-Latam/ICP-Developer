@@ -28,6 +28,14 @@ const IcpSocial = () => {
         setLoading("Done");
     }
 
+    const handleWho = async (e) => {
+        e.preventDefault();
+
+        const result = await social.whoami();
+
+        console.log(result);
+    }
+
     return(
         <div className="flex items-center justify-center flex-col p-4 w-full">
             <h1 className="h1 text-center border-b border-gray-500 pb-2">Hi {principal ? principal : ", connect with Internet Identity to continue"}!</h1>
@@ -54,6 +62,7 @@ const IcpSocial = () => {
                             <p>Post {post[0]}: {post[1].message}</p>
                         </div>);
                 })}
+                <button className="w-full bg-black text-white p-2 font-bold" onClick={handleWho}>Who am I</button>
             </div>
         </div>
     )
