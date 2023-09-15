@@ -1,20 +1,14 @@
 import React from "react"
 import logo from "./assets/dfinity.svg"
-/*
- * Connect2ic provides essential utilities for IC app development
- */
+
 import { createClient } from "@connect2ic/core"
 import { InternetIdentity } from "@connect2ic/core/providers/internet-identity"
 import { ConnectButton, ConnectDialog, Connect2ICProvider } from "@connect2ic/react"
 import "@connect2ic/core/style.css"
-/*
- * Import canister definitions like this:
- */
-import * as social from "../.dfx/local/canisters/social"
+
+//Import canister definitions like this:
+import * as social from "../src/declarations/social"
 import { IcpSocial } from "./components/Social"
-/*
- * Some examples to get you started
- */
 
 function App() {
 
