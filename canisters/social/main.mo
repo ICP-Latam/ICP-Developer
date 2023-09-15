@@ -13,12 +13,13 @@ actor PostCrud {
 	type Post = {
 		creator: Text;
 		message: Text;
+		image: ImageObject;
 	};
 
 	stable var postId: PostId = 0;
 	let postList = HashMap.HashMap<Text, Post>(0, Text.equal, Text.hash);
 
-	private func generateTaskId() : Nat32 {
+	private func generatePostId() : Nat32 {
 		postId += 1;
 		return postId;
 	};
@@ -27,11 +28,11 @@ actor PostCrud {
 		return caller;
 	};
 
-	public shared (msg) func createPost(message: Text) : async () {
+	public shared (msg) func createPost(message: Text, image: ImageObject) : async () {
 		let user: Text = Principal.toText(msg.caller);
-		let post = {creator=user; message=message};
+		let post = {creator=user; message=message; image=image};
 
-		postList.put(Nat32.toText(generateTaskId()), post);
+		postList.put(Nat32.toText(generatePostId()), post);
 		Debug.print("New post created! ID: " # Nat32.toText(postId));
 		return ();
 	};
@@ -57,7 +58,7 @@ actor PostCrud {
 				return false;
 			};
 			case (?currentPost) {
-				let newPost: Post = {creator=user; message=message};
+				let newPost: Post = {creator=user; message=message; image=currentPost.image};
 				postList.put(id, newPost);
 				Debug.print("Updated post with ID: " # id);
 				return true;

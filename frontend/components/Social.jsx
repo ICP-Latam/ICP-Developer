@@ -1,10 +1,18 @@
 import { useCanister, useConnect } from "@connect2ic/react";
+import { resizeImage, fileToCanisterBinaryStoreFormat } from "../utils/image"
+import { useDropzone } from "react-dropzone"
+
 import React, { useEffect, useState } from "react";
+import { SocialItem } from "./SocialItem";
+
+const ImageMaxWidth = 2048
 
 const IcpSocial = () => {
+    const [social] = useCanister("social");
+    
     const [posts, setPosts] = useState([]);
     const [loading, setLoading] = useState("");
-    const [social] = useCanister("social");
+    const [file, setFile] = useState(null);
 
     const {principal} = useConnect();
 
@@ -12,35 +20,52 @@ const IcpSocial = () => {
         refreshPosts();  // Llama a refreshPosts cuando el componente se monta
     }, []);
 
+    const { getRootProps, getInputProps } = useDropzone({
+        maxFiles: 1,
+        accept: {
+          "image/png": [".png"],
+          "image/jpeg": [".jpg", ".jpeg"]
+        },
+        onDrop: async acceptedFiles => {
+          if (acceptedFiles.length > 0) {
+            try {
+              const firstFile = acceptedFiles[0]
+              const newFile = await resizeImage(firstFile, ImageMaxWidth)
+              setFile(newFile)
+            } catch (error) {
+              console.error(error)
+            }
+          }
+        }
+    })
+
     const refreshPosts = async () => {
         setLoading("Loading...");
         try {
             const result = await social.getPosts();
             setPosts(result.sort((a, b) => parseInt(a[0]) - parseInt(b[0])));  // Ordenar posts por ID
             setLoading("Done");
-        } catch {
+        } catch(e) {
+            console.log(e);
             setLoading("Error happened fetching posts list");
         }
     }
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+        if (file == null) {
+            return
+        }
+
         setLoading("Loading...");
-        await social.createPost(e.target[0].value);
+        const fileArray = await fileToCanisterBinaryStoreFormat(file)
+
+        await social.createPost(e.target[0].value, fileArray);
         await refreshPosts();
     }
 
-    const handleRefresh = async (e) => {
-        e.preventDefault();
+    const handleRefresh = async () => {
         await refreshPosts();
-    }
-
-    const handleWho = async (e) => {
-        e.preventDefault();
-
-        const result = await social.whoami();
-
-        console.log(result);
     }
 
     return(
@@ -48,28 +73,30 @@ const IcpSocial = () => {
             <h1 className="h1 text-center border-b border-gray-500 pb-2">Hi {principal ? principal : ", connect with Internet Identity to continue"}!</h1>
             {/* Create post section */}
             <form onSubmit={handleSubmit}>
-                <div className="flex justify-between w-96 items-center border mt-4 border-gray-500 p-5 space-x-2">
-                    <div className="space-y-2">
-                        <p>What are you thinking about?</p>
-                        <input required className="border border-gray-500" type="text"/>
+                <div className="flex flex-col items-center border mt-4 border-gray-500 p-5 space-x-2 w-96">
+                    <div className="flex flex-col space-y-2 w-full">
+                        <label htmlFor="message">What are you thinking about?</label>
+                        <input id="message" required className="border border-gray-500 px-2" type="text"/>
+                        <button className="w-full" {...getRootProps({ className: "dropzone" })}>
+                            <p className="bg-gray-950 hover:bg-gray-900 text-white p-2">Pick an image</p>
+                            <input required {...getInputProps()} />
+                        </button>
+                        <p className="mt-2 border-b border-gray-500">{file ? file.name : "No file selected"}</p>
+                        <button type="submit" className="w-full p-2 rounded-sm bg-gray-950 hover:bg-gray-900 text-white text-lg font-bold">Create</button>
                     </div>
-                    <button type="submit" className="p-2 rounded-sm bg-black text-white text-lg font-bold">Create</button>
+                    
                 </div>
             </form>
 
             <p className="mx-2">{loading}</p>
 
             {/* Post section */}
-            <div className="w-96 mt-4 space-y-2">
+            <div className="mt-4 space-y-2 w-96">
                 <h2 className="h2 font-bold text-xl text-start">Posts</h2>
-                <button className="w-full bg-black text-white p-2 font-bold" onClick={handleRefresh}>Refresh</button>
+                <button className="w-full bg-gray-950 hover:bg-gray-900 text-white p-2 font-bold" onClick={handleRefresh}>Refresh</button>
                 {posts.map((post) => {
-                    console.log(post[0])
-                    return(<div className="border border-gray-500 p-2" key={post[0]}>
-                            <p>Post {post[0]}: {post[1].message}</p>
-                        </div>);
+                    return(<SocialItem key={post[0]} post={post} refresh={handleRefresh} />);
                 })}
-                <button className="w-full bg-black text-white p-2 font-bold" onClick={handleWho}>Who am I</button>
             </div>
         </div>
     )
