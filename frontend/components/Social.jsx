@@ -1,5 +1,5 @@
 import { useCanister, useConnect } from "@connect2ic/react";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 
 const IcpSocial = () => {
     const [posts, setPosts] = useState([]);
@@ -7,6 +7,10 @@ const IcpSocial = () => {
     const [social] = useCanister("social");
 
     const {principal} = useConnect();
+
+    useEffect(() => {
+        refreshPosts();  // Llama a refreshPosts cuando el componente se monta
+    }, []);
 
     const refreshPosts = async () => {
         setLoading("Loading...");
