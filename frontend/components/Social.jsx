@@ -8,24 +8,27 @@ const IcpSocial = () => {
 
     const {principal} = useConnect();
 
-    const handleSubmit = async (e) => {
+    const refreshPosts = async () => {
         setLoading("Loading...");
-        e.preventDefault();
-        const result = await social.createPost(e.target[0].value);
+        try {
+            const result = await social.getPosts();
+            setPosts(result.sort((a, b) => parseInt(a[0]) - parseInt(b[0])));  // Ordenar posts por ID
+            setLoading("Done");
+        } catch {
+            setLoading("Error happened fetching posts list");
+        }
+    }
 
-        handleRefresh();
-        setLoading("Done");
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+        setLoading("Loading...");
+        await social.createPost(e.target[0].value);
+        await refreshPosts();
     }
 
     const handleRefresh = async (e) => {
         e.preventDefault();
-        setLoading("Loading...");
-
-        const result = await social.getPosts();
-
-        console.log(result);
-        setPosts(result);
-        setLoading("Done");
+        await refreshPosts();
     }
 
     return(
