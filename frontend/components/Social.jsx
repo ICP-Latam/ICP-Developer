@@ -1,5 +1,5 @@
 import { useCanister, useConnect } from "@connect2ic/react";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 
 const IcpSocial = () => {
     const [posts, setPosts] = useState([]);
@@ -8,24 +8,31 @@ const IcpSocial = () => {
 
     const {principal} = useConnect();
 
-    const handleSubmit = async (e) => {
-        setLoading("Loading...");
-        e.preventDefault();
-        const result = await social.createPost(e.target[0].value);
+    useEffect(() => {
+        refreshPosts();  // Llama a refreshPosts cuando el componente se monta
+    }, []);
 
-        handleRefresh();
-        setLoading("Done");
+    const refreshPosts = async () => {
+        setLoading("Loading...");
+        try {
+            const result = await social.getPosts();
+            setPosts(result.sort((a, b) => parseInt(a[0]) - parseInt(b[0])));  // Ordenar posts por ID
+            setLoading("Done");
+        } catch {
+            setLoading("Error happened fetching posts list");
+        }
+    }
+
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+        setLoading("Loading...");
+        await social.createPost(e.target[0].value);
+        await refreshPosts();
     }
 
     const handleRefresh = async (e) => {
         e.preventDefault();
-        setLoading("Loading...");
-
-        const result = await social.getPosts();
-
-        console.log(result);
-        setPosts(result);
-        setLoading("Done");
+        await refreshPosts();
     }
 
     return(
