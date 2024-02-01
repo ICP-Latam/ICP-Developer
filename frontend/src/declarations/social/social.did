@@ -1,0 +1,18 @@
+type Post = 
+ record {
+   creator: text;
+   image: ImageObject;
+   message: text;
+ };
+type ImageObject = vec nat8;
+service : {
+  createPost: (text, ImageObject) -> ();
+  deletePost: (text) -> (bool);
+  getPost: (text) -> (opt Post) query;
+  getPosts: () -> (vec record {
+                         text;
+                         Post;
+                       }) query;
+  updatePost: (text, text) -> (bool);
+  whoami: () -> (principal) query;
+}

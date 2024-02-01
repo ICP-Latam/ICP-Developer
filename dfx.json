@@ -2,7 +2,10 @@
   "canisters": {
     "social": {
       "main": "canisters/social/main.mo",
-      "type": "motoko"
+      "type": "motoko",
+      "declarations": {
+        "output": "frontend/src/declarations/social"
+      }
     },
     "crud": {
       "main": "canisters/crud/main.mo",
