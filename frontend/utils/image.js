@@ -30,7 +30,7 @@ const DefauttMaxWidth = 768
 export const resizeImage = async (file, maxWidth) => {
   return new Promise(resolve => {
     new Compressor(file, {
-      quality: 0.8,
+      quality: 0.5,
       maxWidth: maxWidth || DefauttMaxWidth,
       mimeType: "image/jpeg",
       success(result) {

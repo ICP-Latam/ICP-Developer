@@ -62,7 +62,9 @@ function App() {
     const identity = authClient.getIdentity()
     idRef.current = identity
     setAuth(false)
+    window.location.reload()
   }
+
 
   // async function print() {
   //   console.log(actorCrud)
@@ -82,10 +84,12 @@ function App() {
 
       if (await authClient.isAuthenticated()) {
         await handleAuthenticated(authClient)
+
         setAuth(true);
       } else {
         setAuth(false);
       }
+
     };
     
     initAuth();
