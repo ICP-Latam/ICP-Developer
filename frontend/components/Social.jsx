@@ -1,4 +1,4 @@
-import { useCanister, useConnect } from "@connect2ic/react";
+// import { useCanister, useConnect } from "@connect2ic/react";
 import { resizeImage, fileToCanisterBinaryStoreFormat } from "../utils/image"
 import { useDropzone } from "react-dropzone"
 
@@ -7,14 +7,15 @@ import { SocialItem } from "./SocialItem";
 
 const ImageMaxWidth = 2048
 
-const IcpSocial = () => {
-    const [social] = useCanister("social");
+// local and production
+
+const IcpSocial = (props) => {
     
+    const social = props.actorSocial
     const [posts, setPosts] = useState([]);
     const [loading, setLoading] = useState("");
     const [file, setFile] = useState(null);
 
-    const {principal} = useConnect();
 
     useEffect(() => {
         refreshPosts();  // Llama a refreshPosts cuando el componente se monta
@@ -59,6 +60,7 @@ const IcpSocial = () => {
 
         setLoading("Loading...");
         const fileArray = await fileToCanisterBinaryStoreFormat(file)
+        console.log(fileArray)
 
         await social.createPost(e.target[0].value, fileArray);
         await refreshPosts();
@@ -70,7 +72,7 @@ const IcpSocial = () => {
 
     return(
         <div className="flex items-center justify-center flex-col p-4 w-full">
-            <h1 className="h1 text-center border-b border-gray-500 pb-2">Hi {principal ? principal : ", connect with Internet Identity to continue"}!</h1>
+            <h1 className="h1 text-center border-b border-gray-500 pb-2">Hi {props.principal ? props.principal : ", connect with Internet Identity to continue"}!</h1>
             {/* Create post section */}
             <form onSubmit={handleSubmit}>
                 <div className="flex flex-col items-center border mt-4 border-gray-500 p-5 space-x-2 w-96">
