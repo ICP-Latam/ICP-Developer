@@ -13,7 +13,7 @@ actor PostCrud {
 	type Post = {
 		creator: Principal;
 		message: Text;
-		image: ImageObject;
+		image: Text;
 	};
 
 	stable var postId: PostId = 0;
@@ -28,9 +28,10 @@ actor PostCrud {
 		return caller;
 	};
 
-	public shared (msg) func createPost(message: Text, image: ImageObject) : async () {
+	public shared (msg) func createPost(message: Text, image: Text) : async () {
 		let user: Principal = msg.caller;
 		let post = {creator=user; message=message; image=image};
+		Debug.print("a" );
 
 		postList.put(Nat32.toText(generatePostId()), post);
 		Debug.print("New post created! ID: " # Nat32.toText(postId));

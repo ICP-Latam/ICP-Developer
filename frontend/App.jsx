@@ -1,10 +1,10 @@
-import React, { useEffect, useState, useRef } from "react"
+import React, { useEffect, useState, useRef, useCallback } from "react"
 import logo from "./assets/dfinity.svg"
 import {IcpSocial} from './components/Social'
 
 // IC modules
 import { AuthClient } from '@dfinity/auth-client';
-import { createActor, canisterId } from '../src/declarations/crud';
+import { createActor, canisterId} from '../src/declarations/social';
 import { HttpAgent } from '@dfinity/agent'; 
 
 // local and production
@@ -15,10 +15,15 @@ const productionHost = "https://ic0.app";
 import "@connect2ic/core/style.css"
 
 function App() {
+  const [refreshTrigger, setRefreshTrigger] = useState(0); 
   const [auth, setAuth] = useState(false)
-  const [actorCrud, setActorCrud] = useState(null)
   const [actorSocial, setActorSocial] = useState(null)
+  const actorRef = useRef(null)
   const idRef = useRef(null)
+
+  const triggerRefresh = useCallback(() => {
+    setRefreshTrigger(prev => prev + 1); 
+  }, []);
 
   async function handleLogin() {
     const authClient = await AuthClient.create()
@@ -33,6 +38,8 @@ function App() {
     })
   }
 
+  
+
   async function handleAuthenticated(authClient) {
   
     const identity = authClient.getIdentity()
@@ -42,17 +49,15 @@ function App() {
       identity, 
       host: environment? localHost : productionHost,
     })
-    const actorCrud = createActor(canisterId, { /// CRUD 
+
+    actorRef.current = createActor(canisterId, {
       agent
     })
-    const actorSocial = createActor(process.env.CANISTER_ID_SOCIAL, {
-      agent
-    })
-    
-    
+    console.log("1")
+
+    setActorSocial(() => actorRef.current)
     setAuth(true)
-    setActorSocial(() => actorSocial)
-    setActorCrud(() => actorCrud)
+
   }
 
   async function handleLogout(){
@@ -66,42 +71,28 @@ function App() {
   }
 
 
-  // async function print() {
-  //   console.log(actorCrud)
-  //   console.log(actorSocial)
-
-  //   console.log(id.getPrincipal().toString())
-    
-
-  // }
-
   useEffect(() => {
     const initAuth = async () => {
-
-      const authClient = await AuthClient.create()
-      const identity = authClient.getIdentity()
-      idRef.current = identity
+      const authClient = await AuthClient.create();
+      const identity = authClient.getIdentity();
+      idRef.current = identity;
 
       if (await authClient.isAuthenticated()) {
-        await handleAuthenticated(authClient)
-
+        await handleAuthenticated(authClient);
         setAuth(true);
       } else {
         setAuth(false);
       }
-
     };
-    
     initAuth();
   }, []);
 
 
-    return (
+  return (
     <div className="min-h-screen">
       <header className="relative flex justify-start items-center p-4 border-b border-gray-600">
         <img src={logo} width="80" alt="logo" />
         <div className="absolute top-2 right-2">
-          {/* <button onClick={print}> Click</button> */}
           <button
             onClick={auth ? handleLogout : handleLogin}
             className={`
@@ -117,8 +108,9 @@ function App() {
 
       <IcpSocial 
       principal = { idRef.current?.getPrincipal()?.toString() || ""} 
-      actorCrud = { actorCrud }
-      actorSocial = { actorSocial } /> 
+      actorSocial = { actorRef.current } 
+      onRefresh = {triggerRefresh} 
+      refreshTrigger = {refreshTrigger} /> 
     </div>
     )
 }

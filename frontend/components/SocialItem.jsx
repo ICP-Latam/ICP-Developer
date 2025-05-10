@@ -1,6 +1,3 @@
-import { useCanister } from "@connect2ic/react";
-
-import { arrayBufferToImgSrc } from "../utils/image";
 import React, { useState } from "react";
 
 const ImageMaxWidth = 2048
@@ -8,10 +5,8 @@ const ImageMaxWidth = 2048
 const SocialItem = (props) => {
     const { id, data, refresh, actorSocial } = props;
     const [loading, setLoading] = useState("");
-    const [file, setFile] = useState(null);
     const [message, setMessage] = useState(data.message);
     const [visible, setVisible] = useState(false);
-    const [update, setUpdate] = useState(false);
 
     const handleUpdate = async (event) => {
         event.preventDefault();
@@ -48,7 +43,7 @@ const SocialItem = (props) => {
             <p className="border-b border-gray-500"> <strong>Posted by: </strong>{data.creator.toText()} </p>
             <div className="mb-2">
                 <p>{data.message}</p>
-                <img width="368" src={arrayBufferToImgSrc(data.image)} />
+                <img width="368" src={data.image} alt={`${data.message} by ${data.creator.toText()}`}/>
             </div>
             <div className={`${visible ? `flex` : `hidden`} flex-col items-center justify center w-full space-y-2 my-2`}>
                 <input className="border border-gray-500 px-2 w-full" type="text" value={message} onChange={(e) => setMessage(e.target.value)} />

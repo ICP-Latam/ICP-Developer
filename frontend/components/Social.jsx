@@ -1,70 +1,41 @@
-// import { useCanister, useConnect } from "@connect2ic/react";
-import { resizeImage, fileToCanisterBinaryStoreFormat } from "../utils/image"
-import { useDropzone } from "react-dropzone"
-
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { SocialItem } from "./SocialItem";
-
-const ImageMaxWidth = 2048
 
 // local and production
 
 const IcpSocial = (props) => {
     
     const social = props.actorSocial
+    const refreshTrigger = props.refreshTrigger
+
     const [posts, setPosts] = useState([]);
     const [loading, setLoading] = useState("");
-    const [file, setFile] = useState(null);
+
+
+    const refreshPosts = useCallback(async () => {
+        setLoading("Loading...");
+        try {
+          const result = await social.getPosts();
+          setPosts(result.sort((a, b) => parseInt(a[0]) - parseInt(b[0])));
+          setLoading("Done");
+        } catch(e) {
+          console.error(e);
+          setLoading("Error happened fetching posts list");
+        }
+      }, [social]);
 
 
     useEffect(() => {
-        refreshPosts();  // Llama a refreshPosts cuando el componente se monta
-    }, []);
+        refreshPosts();
+      }, [refreshTrigger, refreshPosts]);
 
-    const { getRootProps, getInputProps } = useDropzone({
-        maxFiles: 1,
-        accept: {
-          "image/png": [".png"],
-          "image/jpeg": [".jpg", ".jpeg"]
-        },
-        onDrop: async acceptedFiles => {
-          if (acceptedFiles.length > 0) {
-            try {
-              const firstFile = acceptedFiles[0]
-              const newFile = await resizeImage(firstFile, ImageMaxWidth)
-              setFile(newFile)
-            } catch (error) {
-              console.error(error)
-            }
-          }
-        }
-    })
-
-    const refreshPosts = async () => {
-        setLoading("Loading...");
-        try {
-            const result = await social.getPosts();
-            console.log(result)
-
-            setPosts(result.sort((a, b) => parseInt(a[0]) - parseInt(b[0])));  // Ordenar posts por ID
-            setLoading("Done");
-        } catch(e) {
-            console.log(e);
-            setLoading("Error happened fetching posts list");
-        }
-    }
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        if (file == null) {
-            return
-        }
 
         setLoading("Loading...");
-        const fileArray = await fileToCanisterBinaryStoreFormat(file)
-        console.log(fileArray)
-        console.log(typeof e.target[0].value)
-        await social.createPost(e.target[0].value, fileArray);
+        console.log(social)
+        await social.createPost(e.target[0].value, e.target[1].value);
         await refreshPosts();
     }
 
@@ -81,13 +52,10 @@ const IcpSocial = (props) => {
                     <div className="flex flex-col space-y-2 w-full">
                     <label htmlFor="message">What are you thinking about?</label>
                     <input id="message" required className="border border-gray-500 px-2" type="text"/>
-                    <button className="w-full" {...getRootProps({ className: "dropzone" })}>
-                        <p className="bg-gray-950 hover:bg-gray-900 text-white p-2">Pick an image</p>
-                        <input {...getInputProps()} />  {/* Sin required */}
-                    </button>
-                    <p className="mt-2 border-b border-gray-500">
-                        {file ? file.name : "No file selected"}
-                    </p>
+                   
+                    <label htmlFor="message">Insert image URL</label>
+                    <input id="message" required className="border border-gray-500 px-2" type="text"/>
+
                     <button type="submit" className="w-full p-2 rounded-sm bg-gray-950 hover:bg-gray-900 text-white text-lg font-bold">
                         Create
                     </button>
