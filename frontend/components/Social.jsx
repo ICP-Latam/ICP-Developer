@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useState } from "react";
 import { SocialItem } from "./SocialItem";
-
-// local and production
+import { resizeImage, fileToCanisterBinaryStoreFormat } from "../utils/image"
+import { useDropzone } from "react-dropzone"
 
 const IcpSocial = (props) => {
     
@@ -10,7 +10,28 @@ const IcpSocial = (props) => {
 
     const [posts, setPosts] = useState([]);
     const [loading, setLoading] = useState("");
+    const [file, setFile] = useState(null);
 
+    const ImageMaxWidth = 2048
+
+    const { getRootProps, getInputProps } = useDropzone({
+        maxFiles: 1,
+        accept: {
+          "image/png": [".png"],
+          "image/jpeg": [".jpg", ".jpeg"]
+        },
+        onDrop: async acceptedFiles => {
+          if (acceptedFiles.length > 0) {
+            try {
+              const firstFile = acceptedFiles[0]
+              const newFile = await resizeImage(firstFile, ImageMaxWidth)
+              setFile(newFile)
+            } catch (error) {
+              console.error(error)
+            }
+          }
+        }
+    })
 
     const refreshPosts = useCallback(async () => {
         setLoading("Loading...");
@@ -29,13 +50,31 @@ const IcpSocial = (props) => {
         refreshPosts();
       }, [refreshTrigger, refreshPosts]);
 
+    
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+        var a = null
+        if (e.target[1].value == "" & file == null) {
+            setLoading("Upload an image first!")
+            return
+        } else if (file != null) {
+            setLoading("Loading...");
+            const fileArray = await fileToCanisterBinaryStoreFormat(file)
+            a = JSON.stringify(fileArray)
+
+        } else {
+            a = e.target[1].value
+            
+        }
+        console.log(a)
 
         setLoading("Loading...");
+        await social.createPost(e.target[0].value, a);
         console.log(social)
-        await social.createPost(e.target[0].value, e.target[1].value);
+        e.target[1].value = ""
+        e.target[0].value = ""
+        setFile(null)
         await refreshPosts();
     }
 
@@ -54,7 +93,13 @@ const IcpSocial = (props) => {
                     <input id="message" required className="border border-gray-500 px-2" type="text"/>
                    
                     <label htmlFor="message">Insert image URL</label>
-                    <input id="message" required className="border border-gray-500 px-2" type="text"/>
+                    <input id="message" className="border border-gray-500 px-2" type="text"/>
+                    
+                    <label>Or upload an image</label>
+                    <button className="w-full" {...getRootProps({ className: "dropzone" })}>
+                            <p className="bg-gray-950 hover:bg-gray-900 text-white p-2">Upload</p>
+                            <input {...getInputProps()} />
+                    </button>
 
                     <button type="submit" className="w-full p-2 rounded-sm bg-gray-950 hover:bg-gray-900 text-white text-lg font-bold">
                         Create

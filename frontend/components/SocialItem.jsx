@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { arrayBufferToImgSrc } from "../utils/image";
 
 const ImageMaxWidth = 2048
 
@@ -8,6 +9,21 @@ const SocialItem = (props) => {
     const [message, setMessage] = useState(data.message);
     const [visible, setVisible] = useState(false);
 
+    const image = imageFormat(data.image) ? data.image : nat8ToImage(data.image)
+
+//////////////////////////// IMAGE FORMAT //////////////////////////////////////////
+    function imageFormat(str) {
+    return typeof str === 'string' && 
+            (str.startsWith('http://') || 
+            str.startsWith('https://'))
+    }
+
+    function nat8ToImage(imageData) {
+        const arr = JSON.parse(imageData)
+        return arrayBufferToImgSrc(arr)
+    }
+
+////////////////////////// POST FUNCTIONS ////////////////////////////////////////////
     const handleUpdate = async (event) => {
         event.preventDefault();
         setLoading("Loading...");
@@ -43,7 +59,7 @@ const SocialItem = (props) => {
             <p className="border-b border-gray-500"> <strong>Posted by: </strong>{data.creator.toText()} </p>
             <div className="mb-2">
                 <p>{data.message}</p>
-                <img width="368" src={data.image} alt={`${data.message} by ${data.creator.toText()}`}/>
+                <img width="368" src={image} alt={`${data.message} by ${data.creator.toText()}`}/>
             </div>
             <div className={`${visible ? `flex` : `hidden`} flex-col items-center justify center w-full space-y-2 my-2`}>
                 <input className="border border-gray-500 px-2 w-full" type="text" value={message} onChange={(e) => setMessage(e.target.value)} />

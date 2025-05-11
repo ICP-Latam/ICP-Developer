@@ -53,7 +53,6 @@ function App() {
     actorRef.current = createActor(canisterId, {
       agent
     })
-    console.log("1")
 
     setActorSocial(() => actorRef.current)
     setAuth(true)
