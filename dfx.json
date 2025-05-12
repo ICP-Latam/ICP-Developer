@@ -8,28 +8,22 @@
       "main": "canisters/crud/main.mo",
       "type": "motoko"
     },
+    "frontend": {
+      "type": "assets",
+      "source": ["dist"],
+      "frontend": {
+        "entrypoint": "dist/index.html"
+      }
+    },
     "internet_identity": {
-      "type": "custom",
-      "candid": "https://github.com/dfinity/internet-identity/releases/download/release-2023-09-08/internet_identity.did",
-      "wasm": "https://github.com/dfinity/internet-identity/releases/download/release-2023-09-08/internet_identity_dev.wasm.gz",
+      "candid": "https://github.com/dfinity/internet-identity/releases/latest/download/internet_identity.did",
       "remote": {
         "id": {
           "ic": "rdmx6-jaaaa-aaaaa-aaadq-cai"
         }
-      }
-    },
-    "assets": {
-      "dependencies": [
-        "internet_identity",
-        "social"
-      ],
-      "frontend": {
-        "entrypoint": "dist/index.html"
       },
-      "source": [
-        "dist/"
-      ],
-      "type": "assets"
+      "type": "custom",
+      "wasm": "https://github.com/dfinity/internet-identity/releases/latest/download/internet_identity_dev.wasm.gz"
     }
   },
   "defaults": {
@@ -43,11 +37,10 @@
       "type": "ephemeral"
     },
     "ic": {
-      "providers": [
-        "https://mainnet.dfinity.network"
-      ],
+      "providers": ["https://mainnet.dfinity.network"],
       "type": "persistent"
     }
   },
+  "output_env_file": ".env",
   "version": 1
 }

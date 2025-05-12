@@ -1,5 +1,5 @@
 import HashMap "mo:base/HashMap";
-import Nat "mo:base/Nat";
+// import Nat "mo:base/Nat";
 import Iter "mo:base/Iter";
 import Nat32 "mo:base/Nat32";
 import Text "mo:base/Text";
@@ -11,9 +11,9 @@ actor PostCrud {
 
 	type PostId = Nat32;
 	type Post = {
-		creator: Text;
+		creator: Principal;
 		message: Text;
-		image: ImageObject;
+		image: Text;
 	};
 
 	stable var postId: PostId = 0;
@@ -28,9 +28,10 @@ actor PostCrud {
 		return caller;
 	};
 
-	public shared (msg) func createPost(message: Text, image: ImageObject) : async () {
-		let user: Text = Principal.toText(msg.caller);
+	public shared (msg) func createPost(message: Text, image: Text) : async () {
+		let user: Principal = msg.caller;
 		let post = {creator=user; message=message; image=image};
+		Debug.print("a" );
 
 		postList.put(Nat32.toText(generatePostId()), post);
 		Debug.print("New post created! ID: " # Nat32.toText(postId));
@@ -50,7 +51,7 @@ actor PostCrud {
 	};
 
 	public shared (msg) func updatePost (id: Text, message: Text) : async Bool {
-		let user: Text = Principal.toText(msg.caller);
+		let user: Principal = msg.caller;
 		let post: ?Post = postList.get(id);
 
 		switch (post) {
