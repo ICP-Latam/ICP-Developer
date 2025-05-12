@@ -92,13 +92,13 @@ const IcpSocial = (props) => {
                     <label htmlFor="message">What are you thinking about?</label>
                     <input id="message" required className="border border-gray-500 px-2" type="text"/>
                    
-                    <label htmlFor="message">Insert image URL</label>
-                    <input id="message" className="border border-gray-500 px-2" type="text"/>
+                    {/* <label htmlFor="message">Insert image URL</label>
+                    <input id="message" className="border border-gray-500 px-2" type="text"/> */} 
                     
-                    <label>Or upload an image</label>
+                    <label>Upload image</label>
                     <button className="w-full" {...getRootProps({ className: "dropzone" })}>
                             <p className="bg-gray-950 hover:bg-gray-900 text-white p-2">Upload</p>
-                            <input {...getInputProps()} />
+                            <input  {...getInputProps()} />
                     </button>
 
                     <button type="submit" className="w-full p-2 rounded-sm bg-gray-950 hover:bg-gray-900 text-white text-lg font-bold">

@@ -1,26 +1,29 @@
-# ICP-Developer Project 
-Quick example of a certification project using the *Internet Computer Protocol* to develop a simple social network.
+# Proyecto ICP-Developer  
+Ejemplo rápido de un proyecto de certificación que utiliza el *Protocolo de Internet Computer* para desarrollar una red social simple.
 
-## Details:
-* Fronted developed using React
-* Backend implented in canister social writed in Motoko lenguage. Cointains the following callable methods:
-    *  whoami () -> Principal : Returns the principal of the caller 
-    *  createPost (Text, Text) -> () : inputs are a description if an image and the image URL, it appends the information to an account associed to callers principal
-    *  getPosts () -> [(Text, Post)] : Post its a personalized type, it contains information of createPost and its principal account
-    *  getPost (Text) -> ?Post : same case of above for an specific post selected by and id
-    *  updatePost (Text, Text) -> Bool : Change the image description (also called message) selected by the post's id
-    *  deletePost (Text) -> Bool : Delete the selected post
- 
-# Instructions to local deployment
-To get started, run the following commands
-* Install dependencies with: `npm install`
-* Inicialize the ICP's network local replica: `dfx start --background --clean`
-* Generate the .did files, **important** to connect backend with frontend. `dfx generate` This might cause an ignorable panic error, just go ahead with the next steps
-* Deploy the canisters on local network: `dfx deploy`
-* Inicialize and access to the frontend: `npm run serve`
+## Detalles:
+* Frontend desarrollado usando React
+* Backend implementado en un canister social escrito en lenguaje Motoko. Contiene los siguientes métodos invocables:
+    *  whoami () -> Principal : Devuelve el principal del llamador
+    *  createPost (Text, Text) -> () : los inputs son una descripción de imagen y la URL de la imagen, añade la información a una cuenta asociada al principal del llamador
+    *  getPosts () -> [(Text, Post)] : Post es un tipo personalizado, contiene información de createPost y su cuenta principal
+    *  getPost (Text) -> ?Post : mismo caso que el anterior para un post específico seleccionado por un id
+    *  updatePost (Text, Text) -> Bool : Cambia la descripción de la imagen (también llamada mensaje) seleccionada por el id del post
+    *  deletePost (Text) -> Bool : Elimina el post seleccionado
 
-# Functionality 
-* To proceed an update image an fetch posts, users will need to login to internet identity first. 
-* Once logged in, the users will be able to create a new post completing the descripction and image URL fields, you can proceed clicking "Create" button or pressing enter.
-* You can edit post's description or delete any post.
-* If posts dont refresh automatically please, click on "Refresh" button.
+# Instrucciones para despliegue local
+Para comenzar, ejecuta los siguientes comandos:
+* Instalar dependencias con: `npm install`
+* Inicializar la réplica local de la red ICP: `dfx start --background --clean`
+* Generar los archivos .did, **importante** para conectar backend con frontend: `dfx generate` Esto puede causar un error de panic ignorable, continúa con los siguientes pasos
+* Desplegar los canisters en la red local: `dfx deploy`
+* Inicializar y acceder al frontend: `npm run serve`
+
+# Funcionalidad
+* Para proceder con la actualización de imagen y obtención de posts, los usuarios necesitarán iniciar sesión en Internet Identity primero.
+* Una vez iniciada sesión, los usuarios podrán crear nuevos posts completando los campos de descripción y al subir una imagen, puedes proceder haciendo clic en el botón "Create".
+* Puedes editar la descripción de un post o eliminar cualquier post.
+* Si los posts no se actualizan automáticamente, por favor haz clic en el botón "Refresh".
+
+# Importante:
+Se recomienda borrar la cache del navegador constantemente para evitar problemas con las identidades guardadas en el navegador. Para esto es necesario acceder a las herramientas de inspección mediante click derecho, proceder a entrar a la opción "Aplicación" que se encuentra en el menú donde aparecen los elementos "Elementos" y "Consola", finalmente se debe presionar la opción "Eliminar la información del sitio" o "Clear site data".
